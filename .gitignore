@@ -26,6 +26,3 @@ env/
 *.log
 
 # Local secrets
-*token*.py
-code.py
-1.py
