@@ -4,7 +4,6 @@ from datetime import timedelta
 import yt_dlp
 import asyncio
 import tempfile
-from dotenv import load_dotenv
 import os
 
 intents = discord.Intents.default()
@@ -128,5 +127,5 @@ async def timeout(ctx, member: discord.Member, min: int):
 
 
 # bot token to connect
-load_dotenv()
+
 bot.run(os.getenv("DISCORD_TOKEN"))
