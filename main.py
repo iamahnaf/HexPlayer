@@ -101,12 +101,11 @@ async def insta(ctx, url: str):
 # ─────────────────────────────────────────────────────────────────────────────
 #play any
 @bot.command()
-async def play(ctx, url: str):
-    """Download a video from any supported platform and send it in Discord.
-    Usage: !play <video_url>
-    """
-    social = url.split("/")[2].split(".")[-2].capitalize()  # Extract platform name from URL
-    await download_and_send(ctx, url, social)
+async def video(ctx, url: str):
+    listofwordsFromURL = url.split('/')
+    domain = listofwordsFromURL[2].split(".")
+    
+    await download_and_send(ctx, url, domain[1])
 
 # code for nickname changing
 @bot.command()
@@ -123,15 +122,7 @@ async def nick(ctx, member: discord.Member, *, new_nick=None):
 
 
 # code for timing out a member
-@bot.command()
-@commands.has_permissions(moderate_members=True)
-async def timeout(ctx, member: discord.Member, min: int):
-    try:
-        duration = timedelta(minutes=min)
-        await member.timeout(duration)
-        await ctx.send(f"Timed out {member.mention} for {min} minutes.")
-    except discord.Forbidden:
-        await ctx.send("I don't have permissions to timeout this user")
+
 
 
 # bot token to connect
