@@ -21,7 +21,7 @@ async def hello(ctx):
     await ctx.send("hello am your bot")
 
 
-# ─── Shared Video Downloader ──────────────────────────────────────────────────
+#  Shared Video Downloader
 async def download_and_send(ctx, url: str, platform: str):
     
     status_msg = await ctx.send(f"⏳ Downloading {platform} video, please wait...")
@@ -76,7 +76,7 @@ async def download_and_send(ctx, url: str, platform: str):
 # ─────────────────────────────────────────────────────────────────────────────
 
 
-# ─── Facebook Video Command ───────────────────────────────────────────────────
+# Facebook 
 @bot.command()
 async def fb(ctx, url: str):
    
@@ -84,7 +84,7 @@ async def fb(ctx, url: str):
 # ─────────────────────────────────────────────────────────────────────────────
 
 
-# ─── Instagram Reel Command ───────────────────────────────────────────────────
+#Instagram Reel Command
 @bot.command()
 async def insta(ctx, url: str):
     
@@ -113,7 +113,6 @@ async def nick(ctx, member: discord.Member, *, new_nick=None):
 
 
 # code for timing out a member
-
 
 
 # bot token to connect
