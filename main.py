@@ -23,9 +23,7 @@ async def hello(ctx):
 
 # ─── Shared Video Downloader ──────────────────────────────────────────────────
 async def download_and_send(ctx, url: str, platform: str):
-    """Download a video from the given URL and upload it to Discord.
-    Works for any platform supported by yt-dlp (Facebook, Instagram, etc.)
-    """
+    
     status_msg = await ctx.send(f"⏳ Downloading {platform} video, please wait...")
 
     ydl_opts = {
@@ -81,9 +79,7 @@ async def download_and_send(ctx, url: str, platform: str):
 # ─── Facebook Video Command ───────────────────────────────────────────────────
 @bot.command()
 async def fb(ctx, url: str):
-    """Download a Facebook video and send it in Discord.
-    Usage: !fb <facebook_video_url>
-    """
+   
     await download_and_send(ctx, url, "Facebook")
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -91,12 +87,7 @@ async def fb(ctx, url: str):
 # ─── Instagram Reel Command ───────────────────────────────────────────────────
 @bot.command()
 async def insta(ctx, url: str):
-    """Download an Instagram Reel (or post video) and send it in Discord.
-    Usage: !insta <instagram_reel_url>
-
-    Note: Only PUBLIC Instagram accounts work without login.
-    For private accounts, cookies would be required.
-    """
+    
     await download_and_send(ctx, url, "Instagram")
 # ─────────────────────────────────────────────────────────────────────────────
 #play any
