@@ -73,8 +73,7 @@ async def download_and_send(ctx, url: str, platform: str):
                 os.remove(filepath)
         except Exception:
             pass
-# ─────────────────────────────────────────────────────────────────────────────
-
+# ────────
 
 # Facebook 
 @bot.command()
@@ -97,8 +96,6 @@ async def video(ctx, url: str):
     domain = listofwordsFromURL[2].split(".")
     
     await download_and_send(ctx, url, domain[1])
-
-
 
 
 
