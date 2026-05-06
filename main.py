@@ -5,6 +5,7 @@ import yt_dlp
 import asyncio
 import tempfile
 import os
+from dotenv import load_dotenv
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -98,7 +99,14 @@ async def insta(ctx, url: str):
     """
     await download_and_send(ctx, url, "Instagram")
 # ─────────────────────────────────────────────────────────────────────────────
-
+#play any
+@bot.command()
+async def play(ctx, url: str):
+    """Download a video from any supported platform and send it in Discord.
+    Usage: !play <video_url>
+    """
+    social = url.split("/")[2].split(".")[-2].capitalize()  # Extract platform name from URL
+    await download_and_send(ctx, url, social)
 
 # code for nickname changing
 @bot.command()
@@ -127,5 +135,9 @@ async def timeout(ctx, member: discord.Member, min: int):
 
 
 # bot token to connect
+load_dotenv()
+token = os.getenv("DISCORD_TOKEN")
+if not token:
+    raise SystemExit("DISCORD_TOKEN is missing. Add it to your environment or a .env file.")
 
-bot.run(os.getenv("DISCORD_TOKEN"))
+bot.run(token)
