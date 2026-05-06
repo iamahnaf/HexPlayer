@@ -98,21 +98,8 @@ async def video(ctx, url: str):
     
     await download_and_send(ctx, url, domain[1])
 
-# code for nickname changing
-@bot.command()
-@commands.has_permissions(manage_nicknames=True)
-async def nick(ctx, member: discord.Member, *, new_nick=None):
-    try:
-        await member.edit(nick=new_nick)
-        if new_nick:
-            await ctx.send(f"Changed nickname of {member.mention} to {new_nick}")
-        else:
-            await ctx.send(f"Reset nickname of {member.mention}")
-    except discord.Forbidden:
-        await ctx.send("I don't have the permission to change this user's nickname")
 
 
-# code for timing out a member
 
 
 # bot token to connect
