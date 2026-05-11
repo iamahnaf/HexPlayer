@@ -95,9 +95,6 @@ def ensure_under_limit(input_file):
 
 
 
-
-
-
 #caption issue fix er
 def trim_caption(text: str, limit: int = 200):
     if not text:
