@@ -106,8 +106,6 @@ def trim_caption(text: str, limit: int = 200):
 
 
 
-
-
 # Shared Video Downloader
 async def download_and_send(source, url: str, platform: str):
 
