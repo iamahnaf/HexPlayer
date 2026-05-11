@@ -132,12 +132,54 @@ async def download_and_send(source, url: str, platform: str):
         )
 
     ydl_opts = {
-        "format": "best",
-        "outtmpl": os.path.join(tempfile.gettempdir(), "%(id)s.%(ext)s"),
-        "quiet": True,
-        "no_warnings": True,
-        "merge_output_format": "mp4",
-    }
+    # Best quality
+    "format": "bv*+ba/b",
+
+    # Save path
+    "outtmpl": os.path.join(
+        tempfile.gettempdir(),
+        "%(id)s.%(ext)s"
+    ),
+
+    # Cleaner console
+    "quiet": True,
+    "no_warnings": True,
+
+    # Merge to mp4
+    "merge_output_format": "mp4",
+
+    # Retry system
+    "retries": 10,
+    "fragment_retries": 10,
+    "extractor_retries": 10,
+
+    # Avoid instant blocking
+    "sleep_interval": 2,
+    "max_sleep_interval": 5,
+
+    # Better compatibility
+    "nocheckcertificate": True,
+
+    # Browser headers
+    "http_headers": {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/136.0.0.0 Safari/537.36"
+        ),
+        "Accept-Language": "en-US,en;q=0.9",
+    },
+
+    # Extractor specific args
+    "extractor_args": {
+        "youtube": {
+            "player_client": ["android", "web"]
+        },
+        "instagram": {
+            "api_version": ["v1"]
+        }
+    },
+}
 
     loop = asyncio.get_event_loop()
 
