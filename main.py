@@ -88,16 +88,6 @@ def ensure_under_8mb(input_file):
 
 
 
-
-
-
-
-
-
-
-
-
-
 #caption issue fix er
 def trim_caption(text: str, limit: int = 200):
     if not text:
@@ -111,11 +101,6 @@ def trim_caption(text: str, limit: int = 200):
 
 
 
-
-
-
-
-#  Shared Video Downloader
 # Shared Video Downloader
 async def download_and_send(source, url: str, platform: str):
 
