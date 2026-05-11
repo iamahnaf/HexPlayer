@@ -10,4 +10,4 @@ cmds = [
 ]
 
 [start]
-cmd = ". /opt/venv/bin/activate && python bot.py"
+cmd = ". /opt/venv/bin/activate && python main.py"
