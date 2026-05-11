@@ -2,7 +2,7 @@
 
 A small Discord bot built with discord.py. It includes:
 
-[![Invite Bot](https://img.shields.io/badge/Invite-Discord%20Bot-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com/oauth2/authorize?client_id=1500747950610055248&permissions=2048&integration_type=0&scope=bot+applications.commands)
+[![Invite Bot](https://img.shields.io/badge/Invite-Discord%20Bot-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com/oauth2/authorize?client_id=1500747950610055248&permissions=2048&integration_type=0&scope=bot)
 
 - - Facebook/Instagram/YouTube shorts or reels video download  (25 MB limit).
 
