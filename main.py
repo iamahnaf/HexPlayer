@@ -36,7 +36,7 @@ print("FFmpeg found:", shutil.which("ffmpeg"))
 #Job for videos those are more than 25mb , so we need to compress them
 
 
-MAX_SIZE = 10 * 1024 * 1024 -1  # 10MB for servers with out any boosts
+MAX_SIZE = 10 * 1024 * 1024   # 10MB for servers with out any boosts
 
 
 def get_file_size(path):
