@@ -36,7 +36,7 @@ print("FFmpeg found:", shutil.which("ffmpeg"))
 #Job for videos those are more than 25mb , so we need to compress them
 
 
-MAX_SIZE = 8 * 1024 * 1024  # 8MB
+MAX_SIZE = 10 * 1024 * 1024 -1  # 10MB for servers with out any boosts
 
 
 def get_file_size(path):
@@ -64,7 +64,7 @@ def compress_video(input_path, output_path):
     subprocess.run(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
-def ensure_under_8mb(input_file):
+def ensure_under_limit(input_file):
     size = get_file_size(input_file)
     print(f"Orginal file size : {size/(1024*1024):.2f} MB")
 
@@ -194,7 +194,7 @@ async def download_and_send(source, url: str, platform: str):
 
             await status_msg.edit(content="📦 File too large. Compressing video...")
 
-        final_file = ensure_under_8mb(filepath)
+        final_file = ensure_under_limit(filepath)
 
         if final_file is None:
             await status_msg.edit(
