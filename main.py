@@ -61,23 +61,33 @@ def compress_video(input_path, output_path):
         output_path
     ]
 
-    subprocess.run(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    result = subprocess.run(command, capture_output=True, text=True)
+
+    if result.returncode != 0:
+       
+       print("FFmpeg error:", result.stderr)
+       raise RuntimeError("FFmpeg compression failed")
 
 
 def ensure_under_limit(input_file):
     size = get_file_size(input_file)
-    print(f"Orginal file size : {size/(1024*1024):.2f} MB")
+    print(f"Original file size: {size/(1024*1024):.2f} MB")
 
-    # Already under limit
     if size <= MAX_SIZE:
         return input_file
 
-    compressed_file = "compressed_" + os.path.basename(input_file)
+    # ✅ Use temp directory instead of current folder
+    compressed_file = os.path.join(
+        tempfile.gettempdir(),
+        "compressed_" + os.path.basename(input_file)
+    )
 
     compress_video(input_file, compressed_file)
 
-    # Check compressed size
-    if get_file_size(compressed_file) <= MAX_SIZE:
+    compressed_size = get_file_size(compressed_file)
+    print(f"Compressed file size: {compressed_size/(1024*1024):.2f} MB")
+
+    if compressed_size <= MAX_SIZE:
         return compressed_file
 
     return None
@@ -205,7 +215,7 @@ async def download_and_send(source, url: str, platform: str):
             )
             return
 
-        compressed_file = final_file if final_file != filepath else None
+        compressed_file = final_file if (final_file and final_file != filepath) else None
 
         #await status_msg.edit(content=f"✅ **{title}**")
 
