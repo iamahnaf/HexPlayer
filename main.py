@@ -264,22 +264,30 @@ async def insta(interaction: discord.Interaction, url: str):
 
     await download_and_send(interaction, url, "Instagram")
 
+
+
+
 #play any
 @bot.command()
 async def video(ctx, url: str):
 
-    listofwordsFromURL = url.split('/')
-    domain = listofwordsFromURL[2].split(".")
+    from urllib.parse import urlparse
+    link = url
+    domain = urlparse(link).netloc
+    platform = domain.replace("www.","").split(".")[0]
 
-    await download_and_send(ctx, url, domain[1])
+    await download_and_send(ctx, url, platform)
+
 #slash one er
 @bot.tree.command(name="video", description="Download any supported video")
 async def video(interaction: discord.Interaction, url: str):
 
-    listofwordsFromURL = url.split('/')
-    domain = listofwordsFromURL[2].split(".")
+    from urllib.parse import urlparse
+    link = url
+    domain = urlparse(link).netloc
+    platform = domain.replace("www.","").split(".")[0]
 
-    await download_and_send(interaction, url, domain[1])
+    await download_and_send(interaction, url, platform)
 
 
 # bot token to connect
