@@ -53,20 +53,25 @@ def compress_video(input_path, output_path):
         "ffmpeg",
         "-i", input_path,
         "-vcodec", "libx264",
-        "-crf", "32",
-        "-preset", "veryfast",
+        "-crf", "35",           # ✅ higher = smaller file, less RAM
+        "-preset", "ultrafast", # ✅ ultrafast uses much less memory than veryfast
+        "-tune", "fastdecode",  # ✅ optimized for low resource
         "-acodec", "aac",
-        "-b:a", "128k",
+        "-b:a", "96k",          # ✅ lower audio bitrate
         "-movflags", "+faststart",
+        "-threads", "1",        # ✅ limit to 1 thread to avoid OOM kill
         "-y",
         output_path
     ]
 
-    result = subprocess.run(command, capture_output=True, text=True)
+    result = subprocess.run(
+        command,
+        capture_output=True,
+        text=True,
+        timeout=120  # ✅ kill if takes more than 2 mins
+    )
 
     if result.returncode != 0:
-        # ✅ Print full error so you can see it in Railway logs
-        print("FFmpeg STDOUT:", result.stdout)
         print("FFmpeg STDERR:", result.stderr)
         raise RuntimeError(f"FFmpeg compression failed: {result.stderr[-500:]}")
 
@@ -232,7 +237,7 @@ async def download_and_send(source, url: str, platform: str):
         )
 
     except Exception as e:
-        
+
         await status_msg.edit(
         content=f"❌ Unexpected error: `{str(e)[:300]}`"  # ✅ str(e) shows full message
         )
