@@ -6,6 +6,8 @@ import asyncio
 import tempfile
 import os
 from dotenv import load_dotenv
+import subprocess
+import shutil
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -26,6 +28,92 @@ async def on_ready():
 async def hello(ctx):
     await ctx.send("hello am your bot")
 
+#checking 
+
+print("FFmpeg found:", shutil.which("ffmpeg"))
+
+
+#Job for videos those are more than 25mb , so we need to compress them
+
+
+MAX_SIZE = 8 * 1024 * 1024  # 8MB
+
+
+def get_file_size(path):
+    return os.path.getsize(path)
+
+
+def compress_video(input_path, output_path):
+
+    if shutil.which("ffmpeg") is None:
+        raise RuntimeError("FFmpeg not installed or not in PATH")
+
+    command = [
+        "ffmpeg",
+        "-i", input_path,
+        "-vcodec", "libx264",
+        "-crf", "32",
+        "-preset", "veryfast",
+        "-acodec", "aac",
+        "-b:a", "128k",
+        "-movflags", "+faststart",
+        "-y",
+        output_path
+    ]
+
+    subprocess.run(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+
+def ensure_under_8mb(input_file):
+    size = get_file_size(input_file)
+    print(f"Orginal file size : {size/(1024*1024):.2f} MB")
+
+    # Already under limit
+    if size <= MAX_SIZE:
+        return input_file
+
+    compressed_file = "compressed_" + os.path.basename(input_file)
+
+    compress_video(input_file, compressed_file)
+
+    # Check compressed size
+    if get_file_size(compressed_file) <= MAX_SIZE:
+        return compressed_file
+
+    return None
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#caption issue fix er
+def trim_caption(text: str, limit: int = 200):
+    if not text:
+        return "No title"
+
+    if len(text) > limit:
+        return text[:limit].rstrip() + "..."
+    return text
+
+
+
+
+
+
+
+
 
 #  Shared Video Downloader
 # Shared Video Downloader
@@ -33,7 +121,6 @@ async def download_and_send(source, url: str, platform: str):
 
     is_interaction = isinstance(source, discord.Interaction)
 
-    # Send initial message
     if is_interaction:
         await source.response.send_message(
             f"⏳ Downloading {platform} video, please wait..."
@@ -45,7 +132,7 @@ async def download_and_send(source, url: str, platform: str):
         )
 
     ydl_opts = {
-        "format": "best[filesize<25M]/best",
+        "format": "best",
         "outtmpl": os.path.join(tempfile.gettempdir(), "%(id)s.%(ext)s"),
         "quiet": True,
         "no_warnings": True,
@@ -65,53 +152,65 @@ async def download_and_send(source, url: str, platform: str):
             return filepath, info.get("title", f"{platform} Video")
 
     filepath = None
+    compressed_file = None
 
     try:
         filepath, title = await loop.run_in_executor(None, download)
+        await status_msg.edit(content="📥 Download complete. Checking file size...")
+        title = trim_caption(title,200)
+        
 
-        file_size = os.path.getsize(filepath)
+        # compression
+        size = get_file_size(filepath)
 
-        if file_size > 25 * 1024 * 1024:
+        if size > MAX_SIZE:
 
+            await status_msg.edit(content="📦 File too large. Compressing video...")
+
+        final_file = ensure_under_8mb(filepath)
+
+        if final_file is None:
             await status_msg.edit(
                 content=(
-                    "❌ The video is too large to upload "
-                    "(Discord limit: 25 MB).\n"
-                    "Try a shorter clip or lower quality."
+                    "❌ The video is too large even after compression "
+                    
                 )
             )
+            return
 
+        compressed_file = final_file if final_file != filepath else None
+
+        #await status_msg.edit(content=f"✅ **{title}**")
+
+        safe_title = trim_caption(title, 200)
+        await status_msg.edit(content=f"✅ Ready: **{safe_title}** (uploading...)")
+
+        file_to_send = discord.File(final_file, filename="video.mp4")
+
+        if is_interaction:
+            await source.followup.send(file=file_to_send)
         else:
-            await status_msg.edit(content=f"✅ **{title}**")
-
-            if is_interaction:
-                await source.followup.send(
-                    file=discord.File(filepath, filename="video.mp4")
-                )
-            else:
-                await source.send(
-                    file=discord.File(filepath, filename="video.mp4")
-                )
+            await source.send(file=file_to_send)
 
     except yt_dlp.utils.DownloadError as e:
-
         await status_msg.edit(
-            content=(
-                f"❌ Could not download the {platform} video.\n"
-                f"```{str(e)[:200]}```"
-            )
+            content=f"❌ Download failed:\n```{str(e)[:200]}```"
         )
 
     except Exception as e:
-
         await status_msg.edit(
             content=f"❌ Unexpected error: `{e}`"
         )
 
     finally:
+        # cleanup original + compressed
         try:
             if filepath and os.path.exists(filepath):
                 os.remove(filepath)
+
+            if compressed_file and os.path.exists(compressed_file):
+                os.remove(compressed_file)
+
         except Exception:
             pass
 # ────────
