@@ -49,31 +49,41 @@ def compress_video(input_path, output_path):
     if shutil.which("ffmpeg") is None:
         raise RuntimeError("FFmpeg not installed or not in PATH")
 
+    input_size = os.path.getsize(input_path)
+    mb = input_size / (1024 * 1024)
+    print(f"Compressing: {mb:.2f} MB")
+
+    # Scale based on how big the file is
+    if mb > 80:
+        scale = "scale=-2:480"
+    elif mb > 40:
+        scale = "scale=-2:720"
+    else:
+        scale = "scale=-2:1080"  # barely over limit, keep quality
+
     command = [
         "ffmpeg",
         "-i", input_path,
         "-vcodec", "libx264",
-        "-crf", "35",           # ✅ higher = smaller file, less RAM
-        "-preset", "ultrafast", # ✅ ultrafast uses much less memory than veryfast
-        "-tune", "fastdecode",  # ✅ optimized for low resource
+        "-crf", "28",
+        "-preset", "faster",
         "-acodec", "aac",
-        "-b:a", "96k",          # ✅ lower audio bitrate
+        "-b:a", "96k",
+        "-vf", scale,
         "-movflags", "+faststart",
-        "-threads", "1",        # ✅ limit to 1 thread to avoid OOM kill
+        "-threads", "2",
         "-y",
         output_path
     ]
 
-    result = subprocess.run(
-        command,
-        capture_output=True,
-        text=True,
-        timeout=120  # ✅ kill if takes more than 2 mins
-    )
+    result = subprocess.run(command, capture_output=True, text=True, timeout=180)
 
     if result.returncode != 0:
-        print("FFmpeg STDERR:", result.stderr)
+        print("FFmpeg STDERR:", result.stderr[-1000:])
         raise RuntimeError(f"FFmpeg compression failed: {result.stderr[-500:]}")
+
+    output_size = os.path.getsize(output_path)
+    print(f"Done: {output_size / (1024*1024):.2f} MB")
 
 
 def ensure_under_limit(input_file):
