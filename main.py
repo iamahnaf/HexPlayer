@@ -65,9 +65,10 @@ def compress_video(input_path, output_path):
     result = subprocess.run(command, capture_output=True, text=True)
 
     if result.returncode != 0:
-       
-       print("FFmpeg error:", result.stderr)
-       raise RuntimeError("FFmpeg compression failed")
+        # ✅ Print full error so you can see it in Railway logs
+        print("FFmpeg STDOUT:", result.stdout)
+        print("FFmpeg STDERR:", result.stderr)
+        raise RuntimeError(f"FFmpeg compression failed: {result.stderr[-500:]}")
 
 
 def ensure_under_limit(input_file):
@@ -231,8 +232,9 @@ async def download_and_send(source, url: str, platform: str):
         )
 
     except Exception as e:
+        
         await status_msg.edit(
-            content=f"❌ Unexpected error: `{e}`"
+        content=f"❌ Unexpected error: `{str(e)[:300]}`"  # ✅ str(e) shows full message
         )
 
     finally:
