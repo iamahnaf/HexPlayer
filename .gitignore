@@ -26,4 +26,3 @@ env/
 *.log
 
 # Local secrets
-.main.py
