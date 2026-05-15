@@ -20,7 +20,6 @@ A small Discord bot built with `discord.py` that allows users to download and sh
 - `!video <url>` → Downloads and processes any supported video link  
 - `!fb <facebook_video_url>` → Downloads a Facebook video  
 - `!insta <instagram_video_url>` → Downloads an Instagram video
-- 
 ---
 
 ## ⚙️ Requirements
