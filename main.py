@@ -8,7 +8,7 @@ import os
 from dotenv import load_dotenv
 import subprocess
 import shutil
-
+#Before IOS fix
 intents = discord.Intents.default()
 intents.message_content = True
 
@@ -129,10 +129,26 @@ async def download_and_send(source, url: str, platform: str):
     is_interaction = isinstance(source, discord.Interaction)
 
     if is_interaction:
-        await source.response.send_message(
-            f"⏳ Downloading {platform} video, please wait..."
-        )
-        status_msg = await source.original_response()
+        try:
+            # If the interaction hasn't been acknowledged, defer so we can
+            # perform long-running work and edit the original response.
+            if not source.response.is_done():
+                await source.response.defer(thinking=True)
+                status_msg = await source.original_response()
+                await status_msg.edit(content=f"⏳ Downloading {platform} video, please wait...")
+            else:
+                # Already acknowledged elsewhere; send a followup and keep
+                # the returned message so we can edit it later.
+                status_msg = await source.followup.send(
+                    f"⏳ Downloading {platform} video, please wait...",
+                    wait=True,
+                )
+        except Exception:
+            # Fallback to followup if anything unexpected happens.
+            status_msg = await source.followup.send(
+                f"⏳ Downloading {platform} video, please wait...",
+                wait=True,
+            )
     else:
         status_msg = await source.send(
             f"⏳ Downloading {platform} video, please wait..."
